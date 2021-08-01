@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
 class LanguageTranslation:
-    def __init__(self, gpu, model_prefix_name, languages_supported, models):
+    def __init__(self):
         self.gpu = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model_prefix_name = "Helsinki-NLP/opus-mt-"
         self.languages_supported = {
@@ -45,20 +45,17 @@ class LanguageTranslation:
         model_string_name = f"{self.model_prefix_name}{from_lang}-{to_lang}"
         return AutoModelForSeq2SeqLM.from_pretrained(model_string_name).to(self.gpu)
 
-    def load_languages(self, lang_list: list):
+    def load_languages(self):
         '''
         desc:
             Given list of languages to be able to translate, load the tokenizer/models
             into the self.models dict to be referenced downstream.
             Only supports translating to English currently.
-        inpt:
-            lang_list [list]: list of language abbreviations to be able to translate from.
         oupt:
             self.models [dict]: updated with tokenizer/model combos from lang_list.
         '''
-        all_models = {}
         # Iterate through languages supported to initiate all models/tokenizers
-        for k,v in self.languages_supported.iteritems():
+        for k,v in self.languages_supported.items():
             # Skip english
             if k != "English":
                 # Store in class so it can be referenced internally
@@ -68,7 +65,7 @@ class LanguageTranslation:
     def translate_single(self, from_lang: str, to_lang: str, text: list) -> list:
         '''
         desc:
-            Given a from_lang, to_lang, and text, translated the text using transformer models.
+            Given a from_lang, to_lang, and text, translate the text using transformer models.
             Runs very slow on CPU, is configured to run on GPU.
         inpt:
             from_lang [str]: 2 letter abbreviation of langauge to translated from.
@@ -99,7 +96,7 @@ class LanguageTranslation:
     def reconstruct_inpt(self, inpt_list: list) -> list:
         '''
         desc:
-            Given an inpt list of dicts, sort the order on the placement key.
+            Given an inpt list of dicts, sort the list on the placement key within each dict.
             This ensures that the API's response is in the same order it was received.
         inpt:
             inpt_list [list]: list of dicts that have a k,v pair for 'placement'.
@@ -112,7 +109,7 @@ class LanguageTranslation:
     def translate_batch(inpt_list: list):
         '''
         desc:
-            Given a list of dictionaries with from_lang and text, translated in batch.
+            Given a list of dictionaries with from_lang and text, translate in batch.
         inpt:
             inpt_list [list]: list of dicts that have the k,v pairs:
                 - from_lang [str]: 2 letter abbreviation of language.
