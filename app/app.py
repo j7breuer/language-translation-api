@@ -7,9 +7,15 @@ from requests.api import request
 from restx_models.schemas import api as translation_models
 from flask_restx.apidoc import apidoc
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from huggingface_translation import LanguageTranslation
 import torch
 import sys
 
+# Initiate all models/tokenizers for translation
+lt = LanguageTranslation()
+lt.load_languages()
+
+# Load api
 app = Flask(__name__)
 api = Api(app)
 
@@ -49,15 +55,29 @@ class translation_single(Resource):
     def post(self):
         data = api.payload
         # Do something
+        from_lang = data["from_lang"]
+        to_lang = data["to_lang"]
+        text = data["text"]
+
+        oupt = lt.translate_single(from_lang, to_lang, [text])
+
         return jsonify(
             {
-                "message": ""
+                "message": f"Message translated from {from_lang} to English.",
+                "data": {
+                    "request": {
+                        "from_lang": from_lang,
+                        "to_lang": to_lang,
+                        "model_name": f"{lt.model_prefix_name}{from_lang}-{to_lang}"
+                    },
+                    "response": oupt[0]
+                }
             }
         )
 
 @api.route("/translation/batch", methods = ["POST"])
 class translation_batch(Resource):
-    @api.expect(translation_models.model["translation_batch"], validate = True)
+    @api.expect(translation_models.models["translation_batch"], validate = True)
     def post(self):
         data = api.payload
         # Do something

@@ -17,6 +17,6 @@ translation_single_model = api.model("translation_single", translation_single_sc
 # Language Translation Batch #
 #----------------------------#
 translation_batch_schema = {
-    "text": fields.List(fields.Nested(api.model("translation_single")), required = True)
+    "text": fields.List(fields.Nested(api.model("translation_single", translation_single_schema)), required = True)
 }
 translation_batch_model = api.model("translation_batch", translation_batch_schema)
