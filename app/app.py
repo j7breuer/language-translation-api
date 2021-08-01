@@ -80,10 +80,13 @@ class translation_batch(Resource):
     @api.expect(translation_models.models["translation_batch"], validate = True)
     def post(self):
         data = api.payload
-        # Do something
+        oupt = lt.translate_batch(data)
         return jsonify(
             {
-                "message": ""
+                "message": f"Batch results of {len(oupt)} messages",
+                "data": {
+                    "response": oupt
+                }
             }
         )
 
