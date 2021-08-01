@@ -1,4 +1,5 @@
 
+from collections import defaultdict
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
@@ -13,7 +14,7 @@ class LanguageTranslation:
             "German": "de",
             "Italian": "it"
         }
-        self.models = {}
+        self.models = defaultdict(dict)
     
     def load_tokenizer(self, from_lang: str, to_lang: str):
         '''
@@ -59,8 +60,8 @@ class LanguageTranslation:
             # Skip english
             if k != "English":
                 # Store in class so it can be referenced internally
-                self.models[f"{k}-en"]["tokenizer"] = self.load_tokenizer(k, "en")
-                self.models[f"{k}-en"]["model"] = self.load_model(k, "en")
+                self.models[f"{v}-en"]["tokenizer"] = self.load_tokenizer(v, "en")
+                self.models[f"{v}-en"]["model"] = self.load_model(v, "en")
 
     def translate_single(self, from_lang: str, to_lang: str, text: list) -> list:
         '''
