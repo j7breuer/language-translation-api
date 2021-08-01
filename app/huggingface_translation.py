@@ -60,7 +60,7 @@ class LanguageTranslation:
                 self.models[f"{k}-en"]["tokenizer"] = load_tokenizer(k, "en")
                 self.models[f"{k}-en"]["model"] = load_model(k, "en")
 
-    def translate_single(from_lang: str, to_lang: str, text: str) -> str:
+    def translate_single(from_lang: str, to_lang: str, text: list) -> list:
         '''
         '''
         tokenized_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].prepare_seq2seq_batch([text], return_tensors = "pt").to(self.gpu)
@@ -72,13 +72,21 @@ class LanguageTranslation:
     def translate_batch(inpt_list: list):
         '''
         '''
-        oupt = []
+        # Create a list of all foreign languages to translate from into english
         foreign_lang_list = list(set([x["from_lang"] for x in inpt_list]))
+        # Organize dictionary such that all text in each language are grouped together
+        # This will speed up translations by reducing redundancy
         inpt_dict = {}
         for lang in foreign_lang_list:
-            inpt_dict[lang] = [x for x in inpt_list if x["from_lang"] == lang]
+            translated_text = self.translate_single(lang, "en", [x["text"] for x in inpt_list if x["from_lang"] == lang])
+            counter = 0
+            [dict(item, **{"translated_text": translated_text[count]} for count, item in enumerate(inpt_list, 0) if item["from_lang"] == lang]
+            for x in inpt_list:
+                x["translated_text"] = translated_text[counter]
+                counter += 1
         for lang, text_list_dict in inpt_dict.iteritems():
             text_list = [x["text"] for x in text_list]
+            [inpt_dict[lang] for x in translate_single(lang, "en", text_list)]
         return oupt
             
 
