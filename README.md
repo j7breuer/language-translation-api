@@ -1,6 +1,6 @@
 
 # Language Tranlsation Microservice [Beta]
-API that provides language translation capabilities using the latest HuggingFace Helsinki models.  This API takes in text from 5 languages currently and can translate accordingly.
+API that provides language translation capabilities using the latest HuggingFace Helsinki models.  This API takes in text from 4 languages currently and can translate into English only.
 
 
 ## Installation
