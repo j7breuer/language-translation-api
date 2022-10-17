@@ -25,28 +25,28 @@ api.add_namespace(translation_models)
 class help(Resource):
     def get(self):
         return {
-            "message": ""
+            "message": "This is an API meant to conduct basic translations between various languages using various transformer based language translation models."
         }
 
 @api.route("/help/single", methods = ["GET"])
 class help_single(Resource):
     def get(self):
         return {
-            "message": ""
+            "message": "Using models from the HuggingFace community, translate text via single calls between two languages via this API endpoint."
         }
 
 @api.route("/help/batch", methods = ["GET"])
 class help_batch(Resource):
     def get(self):
         return {
-            "message": ""
+            "message": "Using models from the HuggingFace community, translate text in batch between two languages via this API call."
         }
 
 @api.route("/help/languages", methods = ["GET"])
 class help_languages(Resource):
     def get(self):
         return {
-            "message": ""
+            "message": "Languages supported: English, Spanish, French, German, Italian."
         }
 
 @api.route("/translation/single", methods = ["POST"])

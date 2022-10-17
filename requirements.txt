@@ -1,4 +1,7 @@
-flask==1.1.2
+flask==2.1.0
+werkzeug==2.1.2
+sentencepiece==0.1.97
 flask_restx==0.5.0
-transformers==4.6.1
-torch==1.9.0+cu111
+transformers==4.23.1
+torch==1.12.1+cu116
+sacremoses==0.0.53
