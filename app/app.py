@@ -25,7 +25,7 @@ api.add_namespace(translation_models)
 class help(Resource):
     def get(self):
         return {
-            "message": "This is an API meant to conduct basic translations between various languages using various transformer based language translation models."
+            "message": "This is an API meant to conduct basic translations between 4 languages and English using various transformer based language translation models."
         }
 
 @api.route("/help/single", methods = ["GET"])
