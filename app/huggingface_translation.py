@@ -107,7 +107,7 @@ class LanguageTranslation:
         # Reorder based on placement key,value pair in dictionary
         return sorted(inpt_list, key = lambda k: k["placement"])
 
-    def translate_batch(inpt_list: list):
+    def translate_batch(self, inpt_list: list):
         '''
         desc:
             Given a list of dictionaries with from_lang and text, translate in batch.
