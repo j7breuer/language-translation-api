@@ -8,7 +8,7 @@ pipeline {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
             }
         }
-        stage('Test') {
+        stage('Unit Testing') {
             steps {
                 echo 'Testing...'
                 echo 'Running pytest...'
@@ -26,7 +26,7 @@ pipeline {
                 echo 'Running docker push...'
             }
         }
-        stage('Cleanup') {
+        stage('SonarQube Code Analysis') {
             steps {
                 echo 'Cleaning...'
                 echo 'Running docker rm...'
