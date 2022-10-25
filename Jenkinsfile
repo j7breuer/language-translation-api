@@ -17,7 +17,6 @@ pipeline {
             steps {
                 echo '\n============================\n[START] PyTest Unit Tests...\n============================\n'
                 echo 'Running pytest...'
-                #sh 'python3.9 -m pytest --cov . --cov-report xml'
                 echo '\n==========================\n[END] PyTest Unit Tests...\n==========================\n'
             }
         }
