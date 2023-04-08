@@ -36,7 +36,23 @@ pipeline {
             steps {
                 echo '\n=======================\n[START] Docker Build...\n=======================\n'
                 echo 'Running docker build...'
-                echo '\n=====================\n[END] Docker Build...\n=====================\n'
+                script {
+                    buildImage = docker.build("language_translation_api:${env.BUILD_ID}")
+                }
+                echo '\n=====================\n[END] Docker Push to Nexus...\n=====================\n'
+            }
+        }
+        stage('Docker Tag and Push to Nexus') {
+            steps {
+                echo '\n=======================\n[START] Docker Push to Nexus...\n=======================\n'
+                echo 'Tagging docker build...'
+                script {
+                    docker.withRegistry("https://192.168.50.25:5000/analytics/", "nexus-login") {
+                        buildImage.push("${env.BUILD_NUMBER}")
+                        buildImage.push("latest")
+                    }
+                }
+                echo '\n=====================\n[END] Docker Push to Nexus...\n=====================\n'
             }
         }
         stage('Docker Publish') {
@@ -46,10 +62,11 @@ pipeline {
                 echo '\n=========================\n[END] Publishing Build...\n=========================\n'
             }
         }
-        stage('Environment Cleanup') {
+        stage('Docker Cleanup') {
             steps {
                 echo '\n==============================\n[START] Cleanup and Removal...\n==============================\n'
                 echo 'Running docker rm...'
+                sh "docker system prune --all --force"
                 echo '\n============================\n[END] Cleanup and Removal...\n============================\n'
             }
         }
