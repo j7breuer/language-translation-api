@@ -6,14 +6,9 @@ import torch
 class LanguageTranslation:
     def __init__(self):
         self.gpu = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        #self.gpu = torch.device("cpu")
         self.model_prefix_name = "Helsinki-NLP/opus-mt-"
-        self.languages_supported = {
-            "English": "en",
-            "Spanish": "es",
-            "French": "fr",
-            "German": "de",
-            "Italian": "it"
-        }
+        self.languages_supported = {}
         self.models = defaultdict(dict)
     
     def load_tokenizer(self, from_lang: str, to_lang: str):
@@ -58,10 +53,25 @@ class LanguageTranslation:
         # Iterate through languages supported to initiate all models/tokenizers
         for k,v in self.languages_supported.items():
             # Skip english
-            if k != "English":
+            if v != "English":
                 # Store in class so it can be referenced internally
-                self.models[f"{v}-en"]["tokenizer"] = self.load_tokenizer(v, "en")
-                self.models[f"{v}-en"]["model"] = self.load_model(v, "en")
+                self.models[f"{k}-en"]["tokenizer"] = self.load_tokenizer(k, "en")
+                self.models[f"{k}-en"]["model"] = self.load_model(k, "en")
+                self.models[f"en-{k}"]["tokenizer"] = self.load_tokenizer("en", k)
+                self.models[f"en-{k}"]["model"] = self.load_model("en", k)
+    
+    def split_array(self, inpt_array: list, size_count: int) -> list:
+        '''
+        desc:
+            Given a list, split it into sub lists with a specific size count
+        inpt:
+            inpt_array [list]: list to break into chunks
+            size_count [int]: int of length to break sublists into
+        oupt:
+            [list[list]]: list of lists with sub lists
+        '''
+        return [inpt_array[i:i+size_count] for i in range(0,len(inpt_array), size_count)]
+
 
     def translate_single(self, from_lang: str, to_lang: str, text: list) -> list:
         '''
@@ -74,7 +84,7 @@ class LanguageTranslation:
             text [list]: list of strings to translate.
         '''
         # Tokenize the text using tokenizer stored in class
-        tokenized_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].prepare_seq2seq_batch(text, return_tensors = "pt").to(self.gpu)
+        tokenized_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"](text, return_tensors = "pt").to(self.gpu)
         # Generate translated tokens using model stored in class
         translated_tokens = self.models[f"{from_lang}-{to_lang}"]["model"].generate(**tokenized_text)
         # Convert translated tokens to english text using tokenizer stored in class
@@ -107,7 +117,29 @@ class LanguageTranslation:
         # Reorder based on placement key,value pair in dictionary
         return sorted(inpt_list, key = lambda k: k["placement"])
 
-    def translate_batch(self, inpt_list: list):
+    def translate_batch(self, from_lang: str, to_lang: str, inpt_list: list):
+        '''
+        desc:
+            Given a list of text, translate in batch.
+        inpt:
+            inpt_list [list]: list of strings in one language:
+            from_lang [str]: 2-3 letter abbreviation of language.
+            to_lang [str]: 2-3 letter abbreviation of language.
+        oupt:
+            oupt_list [list]: list of text translated into target language
+        '''
+        # Tokenize the text using tokenizer stored in class
+        tokenized_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"](inpt_list, return_tensors = "pt", padding = True).to(self.gpu)
+        torch.cuda.empty_cache()
+        # Generate translated tokens using model stored in class
+        translated_tokens = self.models[f"{from_lang}-{to_lang}"]["model"].generate(**tokenized_text)
+        torch.cuda.empty_cache()
+        # Convert translated tokens to english text using tokenizer stored in class
+        translated_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].batch_decode(translated_tokens, skip_special_tokens = True)
+        torch.cuda.empty_cache()
+        return translated_text
+    
+    def translate_batch_dicts(self, inpt_list: list):
         '''
         desc:
             Given a list of dictionaries with from_lang and text, translate in batch.
@@ -120,7 +152,7 @@ class LanguageTranslation:
         '''
         # Create a list of all foreign languages to translate from into english
         inpt_list = self.deconstruct_inpt(inpt_list)
-        foreign_lang_list = list(set([x["from_lang"] for x in inpt_list]))
+        foreign_lang_list = list(set([x["from_lang"] for x in inpt_list if x != "en"]))
         # Loop through languages and translate in batches
         oupt_list = []
         for lang in foreign_lang_list:
