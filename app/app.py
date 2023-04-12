@@ -90,7 +90,7 @@ class translation_batch(Resource):
         from_lang = data["from_lang"]
         to_lang = data["to_lang"]
         oupt_array = []
-        for sub_batch in lt.split_array(data['text'], 25):
+        for sub_batch in lt.split_array(data['text'], 10):
             oupt = lt.translate_batch(from_lang, to_lang, sub_batch)
             oupt_array.extend(oupt)
         #oupt_array = lt.translate_batch(from_lang, to_lang, data['text'])
