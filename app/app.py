@@ -15,10 +15,10 @@ import sys
 # Initiate all models/tokenizers for translation
 lt = LanguageTranslation()
 # Define language dict
-with open("lang_abbr_key.json") as f:
+with open("./app/lang_abbr_key.json") as f:
     abbr_key = json.load(f)
 lt.languages_supported = abbr_key
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 sys.stdout.write("PyTorch Env. Var Set\n")
 
 lt.load_languages()
@@ -109,4 +109,4 @@ class translation_batch(Resource):
         )
 
 if __name__ == "__main__":
-    app.run(debug = False)
+    app.run(host = '0.0.0.0', debug = False, port = 4567)
