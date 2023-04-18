@@ -108,6 +108,6 @@ Expect response to follow this format:
     },
     "response": "Hello how are you?"
   },
-  "message": "Message translated from es to English."
+  "message": "Message translated from Spanish to English."
 }
 ```
