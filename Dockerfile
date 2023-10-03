@@ -7,7 +7,7 @@ RUN set -xe \
 	&& yum install -y python3-pip epel-release
 RUN yum install -y jq
 RUN pip3 install --upgrade pip
-
+RUN echo ping 8.8.8.8
 # Set pip.conf
 RUN export PIP_CONFIG_FILE=/.config/pip/pip.conf
 
