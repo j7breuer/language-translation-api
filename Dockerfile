@@ -5,7 +5,7 @@ LABEL maintainer="j7breuer@gmail.com"
 # Install pip
 RUN set -xe \
 	&& yum install -y python3-pip epel-release
-RUN yum install jq
+RUN yum install -y jq
 RUN pip3 install --upgrade pip
 
 # Set pip.conf
