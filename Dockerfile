@@ -30,7 +30,6 @@ RUN mkdir /app/models
 # Convert all models needed for translations
 RUN echo $PATH
 RUN sh ct2-model-converter.sh ./app/lang_abbr_key.json
-RUN ls /app/models
 
 # Run flask API
 ENTRYPOINT ["python3", "app/app.py"]
