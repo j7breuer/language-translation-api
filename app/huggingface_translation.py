@@ -92,8 +92,9 @@ class LanguageTranslation:
         # Tokenize, translate, convert
         source_tokens = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_ids_to_tokens(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].encode(text))
         results = self.models[f"{from_lang}-{to_lang}"]["model"].translate_batch([source_tokens])
-        # Extract translated text
+        # Extract translated text tokens
         translated_text = results[0].hypotheses[0]
+        # Decode back into text
         oupt_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(translated_text))
         return oupt_text
 
