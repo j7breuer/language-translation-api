@@ -87,14 +87,16 @@ class LanguageTranslation:
             to_lang [str]: 2 letter abbreviation of language to translate to.
             text [str]: string to translate.
         oupt:
-            translated_text [str]: string of translated text
+            oupt_text [str]: string of translated text
         '''
         # Tokenize, translate, convert
         source_tokens = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_ids_to_tokens(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].encode(text))
         results = self.models[f"{from_lang}-{to_lang}"]["model"].translate_batch([source_tokens])
-        # Extract translated text
+        # Extract translated text tokens
         translated_text = results[0].hypotheses[0]
-        return translated_text
+        # Decode back into text
+        oupt_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(translated_text))
+        return oupt_text
 
     def deconstruct_inpt(self, inpt_list: list) -> list:
         '''

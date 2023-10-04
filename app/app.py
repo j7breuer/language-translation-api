@@ -77,7 +77,7 @@ class translation_single(Resource):
                         "to_lang": to_lang,
                         "model_name": f"{lt.model_prefix_name}{from_lang}-{to_lang}"
                     },
-                    "response": oupt[0]
+                    "response": oupt
                 }
             }
         )
