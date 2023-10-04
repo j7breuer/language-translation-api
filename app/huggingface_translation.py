@@ -27,7 +27,7 @@ class LanguageTranslation:
             [tokenizer]: AutoTokenizer object specific to language combination.
         '''
         # Create model string prefix for download/loading, uses helsinki model name
-        model_string_name = f"{self.model_dir}/{from_lang}_{to_lang}"
+        model_string_name = f"{self.model_prefix_name}{from_lang}-{to_lang}"
         return AutoTokenizer.from_pretrained(model_string_name)
 
     def load_model(self, from_lang: str, to_lang: str):
