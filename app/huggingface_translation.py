@@ -2,12 +2,16 @@
 from collections import defaultdict
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
+import ctranslate2
+from tqdm import tqdm
+import transformers
 
 class LanguageTranslation:
     def __init__(self):
         self.gpu = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         #self.gpu = torch.device("cpu")
         self.model_prefix_name = "Helsinki-NLP/opus-mt-"
+        self.model_dir = "./app/models"
         self.languages_supported = {}
         self.models = defaultdict(dict)
     
@@ -38,8 +42,8 @@ class LanguageTranslation:
             [model]: AutoModel object specific to language combination.
         '''
         # Create model string name for download/loading, uses helsinki model name
-        model_string_name = f"{self.model_prefix_name}{from_lang}-{to_lang}"
-        return AutoModelForSeq2SeqLM.from_pretrained(model_string_name).to(self.gpu)
+        model_string_name = f"{self.model_dir}/{from_lang}_{to_lang}"
+        return ctranslate2.Translator(model_string_name)
 
     def load_languages(self):
         '''
@@ -73,7 +77,7 @@ class LanguageTranslation:
         return [inpt_array[i:i+size_count] for i in range(0,len(inpt_array), size_count)]
 
 
-    def translate_single(self, from_lang: str, to_lang: str, text: list) -> list:
+    def translate_single(self, from_lang: str, to_lang: str, text: str) -> list:
         '''
         desc:
             Given a from_lang, to_lang, and text, translate the text using transformer models.
@@ -81,15 +85,15 @@ class LanguageTranslation:
         inpt:
             from_lang [str]: 2 letter abbreviation of langauge to translated from.
             to_lang [str]: 2 letter abbreviation of language to translate to.
-            text [list]: list of strings to translate.
+            text [str]: string to translate.
+        oupt:
+            translated_text [str]: string of translated text
         '''
-        # Tokenize the text using tokenizer stored in class
-        tokenized_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"](text, return_tensors = "pt").to(self.gpu)
-        # Generate translated tokens using model stored in class
-        translated_tokens = self.models[f"{from_lang}-{to_lang}"]["model"].generate(**tokenized_text)
-        # Convert translated tokens to english text using tokenizer stored in class
-        translated_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].batch_decode(translated_tokens, skip_special_tokens = True)
-        torch.cuda.empty_cache()
+        # Tokenize, translate, convert
+        source_tokens = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_ids_to_tokens(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].encode(text))
+        results = self.models[f"{from_lang}-{to_lang}"]["model"].translate_batch([source_tokens])
+        # Extract translated text
+        translated_text = results[0].hypotheses[0]
         return translated_text
 
     def deconstruct_inpt(self, inpt_list: list) -> list:

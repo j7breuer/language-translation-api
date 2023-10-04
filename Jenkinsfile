@@ -37,7 +37,7 @@ pipeline {
                 echo '\n=======================\n[START] Docker Build...\n=======================\n'
                 echo 'Running docker build...'
                 script {
-                    buildImage = docker.build("language_translation_api:${env.BUILD_ID}")
+                    buildImage = docker.build("language_translation_api:${env.BUILD_ID}", "--network=host .")
                 }
                 echo '\n=====================\n[END] Docker Push to Nexus...\n=====================\n'
             }
