@@ -66,7 +66,7 @@ class translation_single(Resource):
         from_lang = data["from_lang"]
         to_lang = data["to_lang"]
         text = data["text"]
-        oupt = lt.translate_single(from_lang, to_lang, [text])
+        oupt = lt.translate_single(from_lang, to_lang, text)
 
         return jsonify(
             {

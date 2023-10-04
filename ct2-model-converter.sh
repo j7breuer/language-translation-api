@@ -7,7 +7,12 @@ jq -r 'keys[]' "$1" | while read -r key; do
     continue
   fi
 
-  # Convert models
-  ct2-transformers-converter --model Helsinki-NLP/opus-mt-${key}-en --output_dir ./app/models/${key}_en --force
+  # Convert models from english to language
+  echo "Downloading and converting: ${key}-en..."
+  ct2-transformers-converter --model Helsinki-NLP/opus-mt-${key}-en --output_dir ./app/models/${key}_en
+
+  # Convert models from language to english
+  echo "Downloading and converting: en-${key}..."
+  ct2-transformers-converter --model Helsinki-NLP/opus-mt-en-${key} --output_dir ./app/models/en_${key}
 
 done
