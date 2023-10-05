@@ -113,7 +113,7 @@ class LanguageTranslation:
         oupt_text = []
         # Reconvert tokens back and then decode array
         [oupt_text.append(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(x.hypotheses[0]))) for x in results]
-        return ''.join(oupt_text)
+        return ' '.join(oupt_text)
 
     def deconstruct_inpt(self, inpt_list: list) -> list:
         '''
