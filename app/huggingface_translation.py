@@ -1,4 +1,5 @@
 
+from nltk.tokenize import sent_tokenize
 from collections import defaultdict
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
@@ -76,6 +77,17 @@ class LanguageTranslation:
         '''
         return [inpt_array[i:i+size_count] for i in range(0,len(inpt_array), size_count)]
 
+    def nltk_sent_split(self, text: str) -> list:
+        '''
+        desc:
+            Given text from any language, use NLTK's sentence splitter to split into sentences
+            for further processing
+        inpt:
+            text [str]: text to be split by sentences, language does not matter
+        oupt:
+            [list]: list of sentences
+        '''
+        return sent_tokenize(text)
 
     def translate_single(self, from_lang: str, to_lang: str, text: str) -> list:
         '''
@@ -89,14 +101,19 @@ class LanguageTranslation:
         oupt:
             oupt_text [str]: string of translated text
         '''
-        # Tokenize, translate, convert
-        source_tokens = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_ids_to_tokens(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].encode(text))
-        results = self.models[f"{from_lang}-{to_lang}"]["model"].translate_batch([source_tokens])
-        # Extract translated text tokens
-        translated_text = results[0].hypotheses[0]
-        # Decode back into text
-        oupt_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(translated_text))
-        return oupt_text
+        # Split by sentence
+        split_sent = self.nltk_sent_split(text)
+        # Create array to append to
+        ts = []
+        # Tokenize split sentences and append encoded oupt for model
+        [ts.append(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_ids_to_tokens(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].encode(i))) for i in split_sent]
+        # Translate from model
+        results = self.models[f"{from_lang}-{to_lang}"]["model"].translate_batch(ts)
+        # Create oupt array to append to
+        oupt_text = []
+        # Reconvert tokens back and then decode array
+        [oupt_text.append(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(x.hypotheses[0]))) for x in results]
+        return ''.join(oupt_text)
 
     def deconstruct_inpt(self, inpt_list: list) -> list:
         '''

@@ -20,6 +20,7 @@ COPY ./requirements.txt /app/requirements.txt
 RUN pip3 install -r requirements.txt
 # Install torch properly
 RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+RUN python3 -m nltk.downloader punkt
 
 # Copy dir
 COPY . /app

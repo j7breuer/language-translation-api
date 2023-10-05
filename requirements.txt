@@ -7,3 +7,4 @@ transformers==4.18.0
 sacremoses==0.0.53
 tqdm==4.46.1
 ctranslate2==2.24.0
+nltk==3.6.7
