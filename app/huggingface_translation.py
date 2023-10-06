@@ -2,14 +2,15 @@
 from nltk.tokenize import sent_tokenize
 from collections import defaultdict
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-#import torch
+import torch
 import ctranslate2
 from tqdm import tqdm
 
 class LanguageTranslation:
     def __init__(self):
-        #self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        #self.gpu = torch.device("cpu")
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.master_lang = "en"
+        self.direction = "bidirectional"
         self.model_prefix_name = "Helsinki-NLP/opus-mt-"
         self.model_dir = "./models"
         self.languages_supported = {}
@@ -43,7 +44,7 @@ class LanguageTranslation:
         '''
         # Create model string name for download/loading, uses helsinki model name
         model_string_name = f"{self.model_dir}/{from_lang}_{to_lang}"
-        return ctranslate2.Translator(model_string_name)
+        return ctranslate2.Translator(model_string_name, device = self.device)
 
     def load_languages(self):
         '''
@@ -57,13 +58,18 @@ class LanguageTranslation:
         # Iterate through languages supported to initiate all models/tokenizers
         for k,v in self.languages_supported.items():
             # Skip english
-            if v != "English":
+            if k != self.master_lang:
                 # Store in class so it can be referenced internally
-                self.models[f"{k}-en"]["tokenizer"] = self.load_tokenizer(k, "en")
-                self.models[f"{k}-en"]["model"] = self.load_model(k, "en")
-                self.models[f"en-{k}"]["tokenizer"] = self.load_tokenizer("en", k)
-                self.models[f"en-{k}"]["model"] = self.load_model("en", k)
-
+                if self.direction == "bidirectional":
+                    self.models[f"{k}-{self.master_lang}"]["tokenizer"] = self.load_tokenizer(k, self.master_lang)
+                    self.models[f"{k}-{self.master_lang}"]["model"] = self.load_model(k, self.master_lang)
+                    self.models[f"{self.master_lang}-{k}"]["tokenizer"] = self.load_tokenizer(self.master_lang, k)
+                    self.models[f"{self.master_lang}-{k}"]["model"] = self.load_model(self.master_lang, k)
+                elif self.direction == "unidirectional":
+                    self.models[f"{k}-{self.master_lang}"]["tokenizer"] = self.load_tokenizer(k, self.master_lang)
+                    self.models[f"{k}-{self.master_lang}"]["model"] = self.load_model(k, self.master_lang)
+                else:
+                    pass
     def nltk_sent_split(self, text: str) -> list:
         '''
         desc:
@@ -100,6 +106,9 @@ class LanguageTranslation:
         oupt_text = []
         # Reconvert tokens back and then decode array
         [oupt_text.append(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(x.hypotheses[0]))) for x in results]
+        # Empty cache if GPU
+        if self.device == "cuda:0":
+            torch.cuda.empty_cache()
         return ' '.join(oupt_text)
 
     def translate_batch(self, from_lang: str, to_lang: str, inpt_list: list):
