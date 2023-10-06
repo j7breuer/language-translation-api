@@ -19,7 +19,7 @@ def client():
 @pytest.fixture()
 def get_help():
     oupt = {
-        "message": "This is an API meant to conduct basic translations between 4 languages and English using various transformer based language translation models."
+        "message": "This is an API meant to conduct basic translations between 2 languages and English using various transformer based language translation models."
     }
     return oupt
 

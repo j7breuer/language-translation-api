@@ -14,26 +14,34 @@ import sys
 
 # Initiate all models/tokenizers for translation
 lt = LanguageTranslation()
-# Define language dict
+
+# Define languages supported
 with open("./models/lang_abbr_key.json") as f:
     abbr_key = json.load(f)
 lt.languages_supported = abbr_key
-#os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
-sys.stdout.write("PyTorch Env. Var Set\n")
 
+# Set master language, already set as default
+# lt.master_lang = "en"
+
+# Set direction of translations (unidirectional vs. bidirectional), already set as default
+# lt.direction = "bidirectional"
+
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+#sys.stdout.write("PyTorch Env. Var Set\n")
+
+# Load all tokenizers/models
 lt.load_languages()
 
-# Load api
+# Load api and add namespace for schemas
 app = Flask(__name__)
 api = Api(app)
-
 api.add_namespace(translation_models)
 
 @api.route("/help", methods = ["GET"])
 class help(Resource):
     def get(self):
         return {
-            "message": "This is an API meant to conduct basic translations between 4 languages and English using various transformer based language translation models."
+            "message": "This is an API meant to conduct basic translations between 2 languages and English using various transformer based language translation models."
         }
 
 @api.route("/help/single", methods = ["GET"])
@@ -113,5 +121,6 @@ class translation_batch(Resource):
             }
         )
 
+# Run app, bind to local ip and port 4567
 if __name__ == "__main__":
     app.run(host = '0.0.0.0', debug = False, port = 4567)

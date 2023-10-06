@@ -18,8 +18,10 @@ COPY ./requirements.txt /app/requirements.txt
 
 #  Get python libraries from nexus server
 RUN pip3 install -r requirements.txt
-# Install torch properly
-RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+# Install torch for cpu
+# RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+# Install torch and cuda for gpu
+RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu118
 RUN python3 -m nltk.downloader punkt
 
 # Copy dir
