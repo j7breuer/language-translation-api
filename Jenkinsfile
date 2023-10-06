@@ -15,7 +15,7 @@ pipeline {
         }
         stage('PyTest Unit Tests') {
             steps {
-                withPythonEnv('python3'){
+                withPythonEnv('python3.9'){
                     echo '\n============================\n[START] PyTest Unit Tests...\n============================\n'
                     echo '\n<--------- Running pytest... --------->'
                     sh 'python3.9 -m pytest --cov . --cov-report xml'
