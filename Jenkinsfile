@@ -4,13 +4,15 @@ pipeline {
     stages {
         stage('Environment Setup') {
             steps {
-                echo '\n=======================\n[START] Initializing...\n=======================\n'
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} \n"
-                echo "Installing PyTorch..."
-                sh 'pip3.9 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu'
-                echo "Installing requirements.txt"
-                sh 'pip3.9 install -r requirements.txt'
-                echo '\n=====================\n[END] Initializing...\n=====================\n'
+                withPythonEnv('python3.9'){
+                    echo '\n=======================\n[START] Initializing...\n=======================\n'
+                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} \n"
+                    echo "\n<--------- Installing PyTorch... --------->"
+                    sh 'pip3.9 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu'
+                    echo "\n<--------- Installing requirements.txt --------->"
+                    sh 'pip3.9 install -r requirements.txt'
+                    echo '\n=====================\n[END] Initializing...\n=====================\n'
+                }
             }
         }
         stage('PyTest Unit Tests') {
