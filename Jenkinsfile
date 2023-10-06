@@ -12,6 +12,7 @@ pipeline {
                     echo "\n<--------- Installing requirements.txt --------->"
                     sh 'pip3.9 install -r requirements.txt'
                     echo "\n<--------- Installing models --------->"
+                    sh "chmod +x ./ct2-model-converter.sh"
                     sh './ct2-model-converter.sh ./models/lang_abbr_key.json'
                     echo '\n=====================\n[END] Initializing...\n=====================\n'
                 }
