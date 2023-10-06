@@ -11,7 +11,7 @@ class LanguageTranslation:
         #self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         #self.gpu = torch.device("cpu")
         self.model_prefix_name = "Helsinki-NLP/opus-mt-"
-        self.model_dir = "./app/models"
+        self.model_dir = "./models"
         self.languages_supported = {}
         self.models = defaultdict(dict)
     

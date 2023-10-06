@@ -26,7 +26,7 @@ RUN python3 -m nltk.downloader punkt
 COPY . /app
 
 # Create directory for models to be stored
-RUN mkdir /app/models
+#RUN mkdir /app/models
 
 # Convert all models needed for translations
 RUN sh ct2-model-converter.sh ./app/lang_abbr_key.json
