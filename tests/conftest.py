@@ -86,7 +86,7 @@ def expected_translation_batch():
         "text": text
     }
     oupt['response'] = {
-        "message": f"Message translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
+        "message": f"Batch results of {len(text)} messages translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
         "data": {
             "request": {
                 "from_lang": from_lang,
