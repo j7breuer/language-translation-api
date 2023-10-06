@@ -15,7 +15,7 @@ import sys
 # Initiate all models/tokenizers for translation
 lt = LanguageTranslation()
 # Define language dict
-with open("./app/lang_abbr_key.json") as f:
+with open("./models/lang_abbr_key.json") as f:
     abbr_key = json.load(f)
 lt.languages_supported = abbr_key
 #os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
@@ -54,7 +54,7 @@ class help_batch(Resource):
 class help_languages(Resource):
     def get(self):
         return {
-            "message": "Languages supported: English, Spanish, French, German, Italian."
+            "message": f"Languages supported: {', '.join(abbr_key.values())}."
         }
 
 @api.route("/translation/single", methods = ["POST"])
@@ -62,22 +62,25 @@ class translation_single(Resource):
     @api.expect(translation_models.models["translation_single"], validate = True)
     def post(self):
         data = api.payload
-        # Do something
+        # Extract request vars
         from_lang = data["from_lang"]
         to_lang = data["to_lang"]
         text = data["text"]
+        # Translate single
         oupt = lt.translate_single(from_lang, to_lang, text)
 
         return jsonify(
             {
-                "message": f"Message translated from {from_lang} to {to_lang}.",
+                "message": f"Message translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
                 "data": {
                     "request": {
                         "from_lang": from_lang,
                         "to_lang": to_lang,
                         "model_name": f"{lt.model_prefix_name}{from_lang}-{to_lang}"
                     },
-                    "response": oupt
+                    "response": {
+                        "text": oupt
+                    }
                 }
             }
         )
@@ -87,24 +90,25 @@ class translation_batch(Resource):
     @api.expect(translation_models.models["translation_batch"], validate = True)
     def post(self):
         data = api.payload
+        # Extract request vars
         from_lang = data["from_lang"]
         to_lang = data["to_lang"]
-        oupt_array = []
-        for sub_batch in lt.split_array(data['text'], 10):
-            oupt = lt.translate_batch(from_lang, to_lang, sub_batch)
-            oupt_array.extend(oupt)
-        #oupt_array = lt.translate_batch(from_lang, to_lang, data['text'])
+        text = data['text']
+        # Translate in batch
+        oupt = lt.translate_batch(from_lang, to_lang, text)
 
         return jsonify(
             {
-                "message": f"Batch results of {len(oupt_array)} messages translted from {from_lang} to {to_lang}.",
+                "message": f"Batch results of {len(oupt)} messages translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
                 "data": {
                     "request": {
                         "from_lang": from_lang,
                         "to_lang": to_lang,
                         "model_name": f"{lt.model_prefix_name}{from_lang}-{to_lang}"
                     },
-                    "response": oupt_array
+                    "response": {
+                        "text": oupt
+                    }
                 }
             }
         )

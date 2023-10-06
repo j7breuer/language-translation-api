@@ -1,17 +1,17 @@
 
+from nltk.tokenize import sent_tokenize
 from collections import defaultdict
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import torch
+#import torch
 import ctranslate2
 from tqdm import tqdm
-import transformers
 
 class LanguageTranslation:
     def __init__(self):
-        self.gpu = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        #self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         #self.gpu = torch.device("cpu")
         self.model_prefix_name = "Helsinki-NLP/opus-mt-"
-        self.model_dir = "./app/models"
+        self.model_dir = "./models"
         self.languages_supported = {}
         self.models = defaultdict(dict)
     
@@ -63,19 +63,18 @@ class LanguageTranslation:
                 self.models[f"{k}-en"]["model"] = self.load_model(k, "en")
                 self.models[f"en-{k}"]["tokenizer"] = self.load_tokenizer("en", k)
                 self.models[f"en-{k}"]["model"] = self.load_model("en", k)
-    
-    def split_array(self, inpt_array: list, size_count: int) -> list:
+
+    def nltk_sent_split(self, text: str) -> list:
         '''
         desc:
-            Given a list, split it into sub lists with a specific size count
+            Given text from any language, use NLTK's sentence splitter to split into sentences
+            for further processing
         inpt:
-            inpt_array [list]: list to break into chunks
-            size_count [int]: int of length to break sublists into
+            text [str]: text to be split by sentences, language does not matter
         oupt:
-            [list[list]]: list of lists with sub lists
+            [list]: list of sentences
         '''
-        return [inpt_array[i:i+size_count] for i in range(0,len(inpt_array), size_count)]
-
+        return sent_tokenize(text)
 
     def translate_single(self, from_lang: str, to_lang: str, text: str) -> list:
         '''
@@ -89,39 +88,19 @@ class LanguageTranslation:
         oupt:
             oupt_text [str]: string of translated text
         '''
-        # Tokenize, translate, convert
-        source_tokens = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_ids_to_tokens(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].encode(text))
-        results = self.models[f"{from_lang}-{to_lang}"]["model"].translate_batch([source_tokens])
-        # Extract translated text tokens
-        translated_text = results[0].hypotheses[0]
-        # Decode back into text
-        oupt_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(translated_text))
-        return oupt_text
-
-    def deconstruct_inpt(self, inpt_list: list) -> list:
-        '''
-        desc:
-            Given an inpt list of dicts, add a placement k,v pair starting from 0.
-        inpt:
-            inpt_list [list]: list of dicts to add the new placement k,v pair.
-        oupt:
-            [list]: list of dicts with new k,v pair.
-        '''
-        # Add placement key,value pair to dictionary
-        return [dict(item, **{"placement": count}) for count, item in enumerate(inpt_list, 0)]
-
-    def reconstruct_inpt(self, inpt_list: list) -> list:
-        '''
-        desc:
-            Given an inpt list of dicts, sort the list on the placement key within each dict.
-            This ensures that the API's response is in the same order it was received.
-        inpt:
-            inpt_list [list]: list of dicts that have a k,v pair for 'placement'.
-        oupt:
-            [list]: sorted list of dictionaries on the placement key.
-        '''
-        # Reorder based on placement key,value pair in dictionary
-        return sorted(inpt_list, key = lambda k: k["placement"])
+        # Split by sentence
+        split_sent = self.nltk_sent_split(text)
+        # Create array to append to
+        ts = []
+        # Tokenize split sentences and append encoded oupt for model
+        [ts.append(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_ids_to_tokens(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].encode(i))) for i in split_sent]
+        # Translate from model
+        results = self.models[f"{from_lang}-{to_lang}"]["model"].translate_batch(ts)
+        # Create oupt array to append to
+        oupt_text = []
+        # Reconvert tokens back and then decode array
+        [oupt_text.append(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].decode(self.models[f"{from_lang}-{to_lang}"]["tokenizer"].convert_tokens_to_ids(x.hypotheses[0]))) for x in results]
+        return ' '.join(oupt_text)
 
     def translate_batch(self, from_lang: str, to_lang: str, inpt_list: list):
         '''
@@ -134,44 +113,10 @@ class LanguageTranslation:
         oupt:
             oupt_list [list]: list of text translated into target language
         '''
-        # Tokenize the text using tokenizer stored in class
-        tokenized_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"](inpt_list, return_tensors = "pt", padding = True).to(self.gpu)
-        torch.cuda.empty_cache()
-        # Generate translated tokens using model stored in class
-        translated_tokens = self.models[f"{from_lang}-{to_lang}"]["model"].generate(**tokenized_text)
-        torch.cuda.empty_cache()
-        # Convert translated tokens to english text using tokenizer stored in class
-        translated_text = self.models[f"{from_lang}-{to_lang}"]["tokenizer"].batch_decode(translated_tokens, skip_special_tokens = True)
-        torch.cuda.empty_cache()
-        return translated_text
-    
-    def translate_batch_dicts(self, inpt_list: list):
-        '''
-        desc:
-            Given a list of dictionaries with from_lang and text, translate in batch.
-        inpt:
-            inpt_list [list]: list of dicts that have the k,v pairs:
-                - from_lang [str]: 2 letter abbreviation of language.
-                - text [str]: text to be translated.
-        oupt:
-            oupt_list [list]: inpt_list where each dict has a new k,v pair of translated text.
-        '''
-        # Create a list of all foreign languages to translate from into english
-        inpt_list = self.deconstruct_inpt(inpt_list)
-        foreign_lang_list = list(set([x["from_lang"] for x in inpt_list if x != "en"]))
-        # Loop through languages and translate in batches
-        oupt_list = []
-        for lang in foreign_lang_list:
-            # Pull all dicts from certain langauge
-            cur_lang_inpt_list = [x for x in inpt_list if x["from_lang"] == lang]
-            # Translate text in batch
-            translated_text = self.translate_single(lang, "en", [x["text"] for x in cur_lang_inpt_list])
-            cur_lang_inpt_list = [dict(item, **{"translated_text": translated_text[count]}) for count, item in enumerate(translated_text, 0)]
-            # Append list of dicts to oupt list
-            oupt_list = oupt_list + cur_lang_inpt_list
-        # Reorder the list of dicts
-        oupt_list = self.reconstruct_inpt(oupt_list)
-        return oupt_list
+        final_oupt = []
+        [final_oupt.append(self.translate_single(from_lang, to_lang, inpt)) for inpt in inpt_list]
+        return final_oupt
+
             
 
 

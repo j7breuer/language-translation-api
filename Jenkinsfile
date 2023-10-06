@@ -4,20 +4,29 @@ pipeline {
     stages {
         stage('Environment Setup') {
             steps {
-                echo '\n=======================\n[START] Initializing...\n=======================\n'
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} \n"
-                echo "Installing PyTorch..."
-                sh 'pip3.9 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu'
-                echo "Installing requirements.txt"
-                sh 'pip3.9 install -r requirements.txt'
-                echo '\n=====================\n[END] Initializing...\n=====================\n'
+                withPythonEnv('python3.9'){
+                    echo '\n=======================\n[START] Initializing...\n=======================\n'
+                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} \n"
+                    echo "\n<--------- Installing PyTorch... --------->"
+                    sh 'pip3.9 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu'
+                    echo "\n<--------- Installing requirements.txt --------->"
+                    sh 'pip3.9 install -r requirements.txt'
+                    sh 'python3.9 -m nltk.downloader punkt'
+                    echo "\n<--------- Installing models --------->"
+                    sh "chmod +x ./ct2-model-converter.sh"
+                    sh './ct2-model-converter.sh ./models/lang_abbr_key.json'
+                    echo '\n=====================\n[END] Initializing...\n=====================\n'
+                }
             }
         }
         stage('PyTest Unit Tests') {
             steps {
-                echo '\n============================\n[START] PyTest Unit Tests...\n============================\n'
-                echo 'Running pytest...'
-                echo '\n==========================\n[END] PyTest Unit Tests...\n==========================\n'
+                withPythonEnv('python3.9'){
+                    echo '\n============================\n[START] PyTest Unit Tests...\n============================\n'
+                    echo '\n<--------- Running pytest... --------->'
+                    sh 'python3.9 -m pytest --cov . --cov-report xml'
+                    echo '\n==========================\n[END] PyTest Unit Tests...\n==========================\n'
+                }
             }
         }
         stage('Sonar Scans') {
