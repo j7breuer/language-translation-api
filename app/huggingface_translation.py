@@ -44,7 +44,11 @@ class LanguageTranslation:
         '''
         # Create model string name for download/loading, uses helsinki model name
         model_string_name = f"{self.model_dir}/{from_lang}_{to_lang}"
-        return ctranslate2.Translator(model_string_name, device = self.device)
+        if str(self.device) == "cpu":
+            model = ctranslate2.Translator(model_string_name)
+        else:
+            model = ctranslate2.Translator(model_string_name, device = self.device)
+        return model
 
     def load_languages(self):
         '''
