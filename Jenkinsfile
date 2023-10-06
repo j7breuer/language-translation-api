@@ -15,9 +15,12 @@ pipeline {
         }
         stage('PyTest Unit Tests') {
             steps {
-                echo '\n============================\n[START] PyTest Unit Tests...\n============================\n'
-                echo 'Running pytest...'
-                echo '\n==========================\n[END] PyTest Unit Tests...\n==========================\n'
+                withPythonEnv('python3'){
+                    echo '\n============================\n[START] PyTest Unit Tests...\n============================\n'
+                    echo '\n<--------- Running pytest... --------->'
+                    sh 'python3.9 -m pytest --cov . --cov-report xml'
+                    echo '\n==========================\n[END] PyTest Unit Tests...\n==========================\n'
+                }
             }
         }
         stage('Sonar Scans') {

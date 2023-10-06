@@ -54,7 +54,7 @@ class help_batch(Resource):
 class help_languages(Resource):
     def get(self):
         return {
-            "message": "Languages supported: English, Spanish, French, German, Italian."
+            "message": f"Languages supported: {', '.join(abbr_key.values())}."
         }
 
 @api.route("/translation/single", methods = ["POST"])
@@ -71,7 +71,7 @@ class translation_single(Resource):
 
         return jsonify(
             {
-                "message": f"Message translated from {from_lang} to {to_lang}.",
+                "message": f"Message translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
                 "data": {
                     "request": {
                         "from_lang": from_lang,
@@ -99,7 +99,7 @@ class translation_batch(Resource):
 
         return jsonify(
             {
-                "message": f"Batch results of {len(oupt)} messages translated from {from_lang} to {to_lang}.",
+                "message": f"Batch results of {len(oupt)} messages translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
                 "data": {
                     "request": {
                         "from_lang": from_lang,
