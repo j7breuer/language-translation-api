@@ -2,8 +2,11 @@
 
 import pytest
 import sys
+import json
 
 sys.path.append("./app")
+with open('../models/lang_abbr_key.json') as f:
+    abbr_key = json.load(f)
 
 from app import app as root_app
 
@@ -53,7 +56,7 @@ def expected_translation_single():
         "text": text
     }
     oupt['response'] = {
-        "message": f"Message translated from {from_lang} to {to_lang}.",
+        "message": f"Message translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
         "data": {
             "request": {
                 "from_lang": from_lang,
@@ -83,7 +86,7 @@ def expected_translation_batch():
         "text": text
     }
     oupt['response'] = {
-        "message": f"Message translated from {from_lang} to {to_lang}.",
+        "message": f"Message translated from {abbr_key[from_lang]} to {abbr_key[to_lang]}.",
         "data": {
             "request": {
                 "from_lang": from_lang,
