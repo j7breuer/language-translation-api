@@ -1,101 +1,50 @@
 
-import pytest
-import sys
+import json
 
-sys.path.append("./app")
+def test_get_help(client, get_help):
+    app = client
+    response = app.get("/help")
+    response_json = response.json
+    assert response.status_code == 200
+    assert response_json == get_help
 
-from app import app as root_app
+def test_get_help_single(client, get_help_single):
+    app = client
+    response = app.get("/help/single")
+    response_json = response.json
+    assert response.status_code == 200
+    assert response_json == get_help_single
 
-@pytest.fixture(scope = "session")
-def client():
-    root_app.testing = True
-    with root_app.test_client() as client:
-        yield client
+def test_get_help_batch(client, get_help_batch):
+    app = client
+    response = app.get("/help/batch")
+    response_json = response.json
+    assert response.status_code == 200
+    assert response_json == get_help_batch
 
-@pytest.fixture()
-def get_help():
-    oupt = {
-        "message": "This is an API meant to conduct basic translations between 4 languages and English using various transformer based language translation models."
-    }
-    return oupt
+def test_get_help_languages(client, get_help_languages):
+    app = client
+    response = app.get("/help/languages")
+    response_json = response.json
+    assert response.status_code == 200
+    assert response_json == get_help_languages
 
-@pytest.fixture()
-def get_help_single():
-    oupt = {
-        "message": "Using models from the HuggingFace community, translate text via single calls between two languages via this API endpoint."
-    }
-    return oupt
+def test_post_single(client, expected_translation_single):
+    app = client
+    req_resp = expected_translation_single
+    expected_request = req_resp['request']
+    expected_response = req_resp['response']
+    response = app.post("/translation/single", json = expected_request)
+    response_json = response.json
+    assert response.status_code == 200
+    assert response_json == expected_response
 
-@pytest.fixture()
-def get_help_batch():
-    oupt = {
-        "message": "Using models from the HuggingFace community, translate text in batch between two languages via this API call."
-    }
-    return oupt
-
-@pytest.fixture()
-def get_help_languages():
-    oupt = {
-        "message": "Languages supported: English, Spanish, German."
-    }
-    return oupt
-
-@pytest.fixture()
-def expected_translation_single():
-    oupt = {}
-    from_lang = 'en'
-    to_lang = 'es'
-    text = 'Hi, how are you doing?'
-    oupt['request'] = {
-        "from_lang": from_lang,
-        "to_lang": to_lang,
-        "text": text
-    }
-    oupt['response'] = {
-        "message": f"Message translated from {from_lang} to {to_lang}.",
-        "data": {
-            "request": {
-                "from_lang": from_lang,
-                "to_lang": to_lang,
-                "model_name": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}"
-            },
-            "response": {
-                "text": "Hola, ¿cómo estás?"
-            }
-        }
-    }
-    return oupt
-
-@pytest.fixture()
-def expected_translation_batch():
-    oupt = {}
-    from_lang = 'en'
-    to_lang = 'es'
-    text = [
-        "Hi, how are you doing?",
-        "I'm doing good and you?",
-        "Pretty good, just looking forwards to finishing unit tests..."
-    ]
-    oupt['request'] = {
-        "from_lang": from_lang,
-        "to_lang": to_lang,
-        "text": text
-    }
-    oupt['response'] = {
-        "message": f"Message translated from {from_lang} to {to_lang}.",
-        "data": {
-            "request": {
-                "from_lang": from_lang,
-                "to_lang": to_lang,
-                "model_name": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}"
-            },
-            "response": {
-                "text": [
-                    "Hola, ¿cómo estás?",
-                    "¿Lo estoy haciendo bien y tú?",
-                    "Bastante bien, sólo con ganas de terminar las pruebas de unidad..."
-                ]
-            }
-        }
-    }
-    return oupt
+def test_post_batch(client, expected_translation_batch):
+    app = client
+    req_resp = expected_translation_batch
+    expected_request = req_resp['request']
+    expected_response = req_resp['response']
+    response = app.post("/translation/batch", json = expected_request)
+    response_json = response.json
+    assert response.status_code == 200
+    assert response_json == expected_response
