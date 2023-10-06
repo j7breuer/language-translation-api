@@ -5,7 +5,7 @@ import sys
 import json
 
 sys.path.append("./app")
-with open('../models/lang_abbr_key.json') as f:
+with open('./models/lang_abbr_key.json') as f:
     abbr_key = json.load(f)
 
 from app import app as root_app
