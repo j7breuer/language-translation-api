@@ -1,5 +1,5 @@
 
-# Language Tranlsation Microservice [Beta]
+# Language Translation Microservice [Beta]
 Flask-based API that provides language translation capabilities using the latest <a href="https://marian-nmt.github.io/">MarianNMT</a> models developed by the <a href="https://blogs.helsinki.fi/language-technology/">Language Technology Research Group at the University of Helsinki</a>.  All model inference times are enhanced using <a href="https://github.com/OpenNMT/CTranslate2">CTranslate2</a>, a C++ and Python library built to optimize transformer models.  This API is fully customizable, by default it takes in text from 3 languages currently and can translate bi-directionally with English (to, from).  The API comes with a single and batch endpoint for translations.
 
 The <a href="https://blogs.helsinki.fi/language-technology/">Language Technology Research Group at the University of Helsinki's</a> models built on the <a href="https://marian-nmt.github.io/">MarianNMT</a> framework benefit from:
@@ -10,7 +10,7 @@ The <a href="https://blogs.helsinki.fi/language-technology/">Language Technology
 - Active developer community 
 
 ## Customization
-### Adding, Removing, Updating Languages [Optional]
+### <u>Adding, Removing, Updating Languages</u> [Optional]
 #### <u>[Default] Languages</u>: English, Spanish, German
 All languages included in the API are located in the ```./models/lang_abbr_key.json``` file as key-value pairs.
 1. Search for translation model on <a href="https://huggingface.co/Helsinki-NLP?sort_models=downloads#models">HuggingFace page</a>
@@ -30,9 +30,11 @@ Please be mindful of the relationship between language (model) count and contain
 
 Consider deploying multiple containers with subsets of languages if desired.
 
-### Changing Master Language [Optional]
+---
+
+### <u>Changing Master Language</u> [Optional]
 #### <u>[Default] Master Language</u>: English
-The API is configured to set English as the 'master' language.  The 'master' language determines the direction of translations between languages in the ```./models/lang_abbr_key.json``` file.  By default, all translations are bi-directional between the 'master' language and other languages in the ```./models/lang_abbr_key.json``` file.
+The API is configured to set English as the 'master' language.  The 'master' language determines the direction of translations between languages in the ```./models/lang_abbr_key.json``` file.  By default, all translations are bidirectional between the 'master' language and other languages in the ```./models/lang_abbr_key.json``` file.
 
 To change the default master language, update the ```./app/app.py``` file below to the new language abbreviation.
 ```
@@ -40,7 +42,9 @@ L23: # Set master language, already set as default
 L24: lt.master_lang = "es"
 ```
 
-### Changing Direction [Optional]
+---
+
+### <u>Changing Direction</u> [Optional]
 #### <u>[Default] Direction</u>: Bidirectional
 The API can be updated from bidirectionally to unidirectionally to translate between languages.  
 
@@ -51,13 +55,17 @@ L27: lt.direction = "unidirectional"
 
 ```
 
-### CPU or GPU Translations [Optional]
+---
+
+### <u>CPU or GPU Translations</u> [Optional]
 #### <u>[Current] Configuration</u>: CPU only, <i>GPU integration still in development</i>
 The API will be able to detect the presence of a GPU on the system, if a GPU is available, all translations will be routed to GPU instead of CPU.  If GPU is not detected, all translations will be sent to CPU.
 
 Space and build time can be saved if you intend to use CPU only by commenting out line 24 of the Dockerfile and uncommenting line 22 to remove the installation of CUDA.  
 
-### CI / CD Integration [Optional]
+---
+
+### <u>CI / CD Integration</u> [Optional]
 The repository does not need to be integrated with CI / CD services but can be easily configured to integrate with Sonarqube, Jenkins, and other services such as Nexus, MLFlow, and more.
 
 If integrating with CI / CD services, please update associated files below:
@@ -66,11 +74,16 @@ If integrating with CI / CD services, please update associated files below:
 - ```./pip.conf``` and ```./Dockerfile``` for referencing custom PyPi
 
 #### Current Metrics:
-1. Code Coverage: XX.XX%
-2. Code Smells: 
-3. Vulnerabilities:
+1. Code Coverage: 93.9%
+2. Code Smells: 8
+3. Vulnerabilities: 0
 
 # Deploying
+There are two options for deployment, via Docker or locally in terminal.  Instructions for both are below:
+## Clone Repository
+```
+git clone https://github.com/j7breuer/language-translation-api.git
+```
 ## Docker Deployment
 ### Docker Build
 ```
