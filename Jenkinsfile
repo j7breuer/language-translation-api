@@ -11,6 +11,7 @@ pipeline {
                     sh 'pip3.9 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu'
                     echo "\n<--------- Installing requirements.txt --------->"
                     sh 'pip3.9 install -r requirements.txt'
+                    sh 'python3.9 -m nltk.downloader punkt'
                     echo "\n<--------- Installing models --------->"
                     sh "chmod +x ./ct2-model-converter.sh"
                     sh './ct2-model-converter.sh ./models/lang_abbr_key.json'
