@@ -58,10 +58,10 @@ L27: lt.direction = "unidirectional"
 ---
 
 ### <u>CPU or GPU Translations</u> [Optional]
-#### <u>[Current] Configuration</u>: CPU only, <i>GPU integration still in development</i>
-The API will be able to detect the presence of a GPU on the system, if a GPU is available, all translations will be routed to GPU instead of CPU.  If GPU is not detected, all translations will be sent to CPU.
+#### <u>[Current] Configuration</u>: CPU or GPU</i>
+Using Torch, the API will be able to detect the presence of a GPU on the system, if a GPU is available, all translations will be routed to GPU instead of CPU.  If GPU is not detected, all translations will be sent to CPU.
 
-Space and build time can be saved if you intend to use CPU only by commenting out line 24 of the Dockerfile and uncommenting line 22 to remove the installation of CUDA.  
+The current configuration for model storage on device is ```auto```, with GPU as first priority, if no GPU present then it will default to CPU.  To hardcode CPU, set  ```lt.device = "cpu"```, for GPU set ```lt.device = "cuda"```.
 
 ---
 
