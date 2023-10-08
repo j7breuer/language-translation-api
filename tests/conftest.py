@@ -60,11 +60,13 @@ def expected_translation_single():
         "data": {
             "request": {
                 "from_lang": from_lang,
-                "to_lang": to_lang,
-                "model_name": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}"
+                "to_lang": to_lang
             },
             "response": {
-                "text": "Hola, ¿cómo estás?"
+                "text": "Hola, ¿cómo estás?",
+                "model": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
+                "tokenizer": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
+                "device": "auto"
             }
         }
     }
@@ -90,15 +92,17 @@ def expected_translation_batch():
         "data": {
             "request": {
                 "from_lang": from_lang,
-                "to_lang": to_lang,
-                "model_name": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}"
+                "to_lang": to_lang
             },
             "response": {
                 "text": [
                     "Hola, ¿cómo estás?",
                     "¿Lo estoy haciendo bien y tú?",
                     "Bastante bien, sólo con ganas de terminar las pruebas de unidad..."
-                ]
+                ],
+                "model": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
+                "tokenizer": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
+                "device": "auto"
             }
         }
     }

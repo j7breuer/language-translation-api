@@ -46,22 +46,30 @@ L24: lt.master_lang = "es"
 
 ### <u>Changing Direction</u> [Optional]
 #### <u>[Default] Direction</u>: Bidirectional
-The API can be updated from bidirectionally to unidirectionally to translate between languages.  
+The API can be updated from bidirectional to unidirectional to translate between languages.  
 
 To change the default direction, update the ```./app/app.py``` file below to the new config:
 ```
 L26: # Set direction of translations, bidirectional by default
 L27: lt.direction = "unidirectional"
-
 ```
 
 ---
 
 ### <u>CPU or GPU Translations</u> [Optional]
-#### <u>[Current] Configuration</u>: CPU or GPU</i>
+#### <u>[Current] Configuration</u>: GPU if present, CPU if not</i>
 Using CTranslate2's device argument of ```auto```, the API will default to GPU if present and use CPU if GPU isn't detected.  To manually override the ```auto``` configuration, set ```lt.device = "cpu"``` or ```lt.device = "cuda"``` in app.py. 
 
+For CPU-only implementation, please use the ```cpu-only``` branch.
 
+If deploying with the intention of using GPU, ensure Docker is configured to connect to GPU - Windows 11 is configured to access GPUs via Docker containers.  If running Windows 10 and below, additional steps will need to be taken to enable Docker to connect to GPU.  By default, the ```master``` branch is set up to be configured for GPU but will fall back to CPU if no GPU is detected.  
+
+#### Troubleshooting
+If a GPU is present and errors occur when hitting the translation endpoints, it is most likely related to Docker not being able to connect to GPU.
+
+1. Check to make sure Nvidia drivers are up-to-date
+2. Check for potential version incompatibility between GPU and docker build
+3. If on Windows 10, additional steps will need to be taken to enable GPU connection on Docker
 ---
 
 ### <u>CI / CD Integration</u> [Optional]
@@ -90,7 +98,12 @@ git clone https://github.com/j7breuer/language-translation-api.git
 docker build -t language_translation_api
 ```
 
-### Docker Run
+### [GPU] Docker Run
+```
+docker run --gpus all -d --name language-translation-api --restart=unless-stopped -p 4567:4567 language_translation_api 
+```
+
+### [CPU] Docker Run
 ```
 docker run -d --name language-translation-api --restart=unless-stopped -p 4567:4567 language_translation_api 
 ```
