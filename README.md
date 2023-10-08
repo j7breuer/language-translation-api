@@ -138,12 +138,16 @@ Expect response to follow this format:
     "data": {
         "request": {
             "from_lang": "es",
-            "model_name": "Helsinki-NLP/opus-mt-es-en",
             "to_lang": "en"
         },
-        "response": "Hello how are you?"
+        "response": {
+          "text": "Hello how are you?",
+          "model": "Helsinki-NLP/opus-mt-es-en",
+          "tokenizer": "Helsinki-NLP/opus-mt-es-en",
+          "device": "auto",
+        }
     },
-    "message": "Message translated from es to English."
+    "message": "Message translated from Spanish to English."
 }
 ```
 
