@@ -71,7 +71,7 @@ class LanguageTranslation:
                     self.models[f"{k}-{self.master_lang}"]["model"] = self.load_model(k, self.master_lang)
                 else:
                     pass
-    def nltk_sent_split(self, text: str) -> list:
+    def sent_split(self, text: str) -> list:
         '''
         desc:
             Given text from any language, use NLTK's sentence splitter to split into sentences
@@ -96,7 +96,7 @@ class LanguageTranslation:
             oupt_text [str]: string of translated text
         '''
         # Split by sentence
-        split_sent = self.nltk_sent_split(text)
+        split_sent = self.sent_split(text)
         # Create array to append to
         ts = []
         # Tokenize split sentences and append encoded oupt for model

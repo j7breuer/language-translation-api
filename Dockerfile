@@ -1,5 +1,7 @@
-FROM centos:7
+# GPU Deployment
+FROM nvidia/cuda:11.8.0-cudnn8-devel-centos7
 
+# Assign maintainer
 LABEL maintainer="j7breuer@gmail.com"
 
 # Install pip
@@ -7,6 +9,7 @@ RUN set -xe \
 	&& yum install -y python3-pip epel-release
 RUN yum install -y jq
 RUN pip3 install --upgrade pip
+
 # Set pip.conf
 RUN export PIP_CONFIG_FILE=/.config/pip/pip.conf
 
@@ -31,7 +34,7 @@ COPY . /app
 #RUN mkdir /app/models
 
 # Convert all models needed for translations
-RUN sh ct2-model-converter.sh ./app/lang_abbr_key.json
+RUN sh ct2-model-converter.sh ./models/lang_abbr_key.json
 
 # Run flask API
 ENTRYPOINT ["python3", "app/app.py"]

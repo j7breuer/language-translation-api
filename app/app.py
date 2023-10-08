@@ -8,7 +8,7 @@ from requests.api import request
 from restx_models.schemas import api as translation_models
 from flask_restx.apidoc import apidoc
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-from huggingface_translation import LanguageTranslation
+from helsinki_translation import LanguageTranslation
 import torch
 import sys
 
@@ -80,11 +80,13 @@ class translation_single(Resource):
                 "data": {
                     "request": {
                         "from_lang": from_lang,
-                        "to_lang": to_lang,
-                        "model_name": f"{lt.model_prefix_name}{from_lang}-{to_lang}"
+                        "to_lang": to_lang
                     },
                     "response": {
-                        "text": oupt
+                        "text": oupt,
+                        "model": f"{lt.model_prefix_name}{from_lang}-{to_lang}",
+                        "tokenizer": f"{lt.model_prefix_name}{from_lang}-{to_lang}",
+                        "device": f"{lt.device}"
                     }
                 }
             }
@@ -108,11 +110,13 @@ class translation_batch(Resource):
                 "data": {
                     "request": {
                         "from_lang": from_lang,
-                        "to_lang": to_lang,
-                        "model_name": f"{lt.model_prefix_name}{from_lang}-{to_lang}"
+                        "to_lang": to_lang
                     },
                     "response": {
-                        "text": oupt
+                        "text": oupt,
+                        "model": f"{lt.model_prefix_name}{from_lang}-{to_lang}",
+                        "tokenizer": f"{lt.model_prefix_name}{from_lang}-{to_lang}",
+                        "device": f"{lt.device}"
                     }
                 }
             }
