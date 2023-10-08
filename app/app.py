@@ -26,9 +26,6 @@ lt.languages_supported = abbr_key
 # Set direction of translations (unidirectional vs. bidirectional), already set as default
 # lt.direction = "bidirectional"
 
-#os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
-#sys.stdout.write("PyTorch Env. Var Set\n")
-
 # Load all tokenizers/models
 lt.load_languages()
 

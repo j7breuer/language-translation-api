@@ -58,10 +58,9 @@ L27: lt.direction = "unidirectional"
 ---
 
 ### <u>CPU or GPU Translations</u> [Optional]
-#### <u>[Current] Configuration</u>: CPU only, <i>GPU integration still in development</i>
-The API will be able to detect the presence of a GPU on the system, if a GPU is available, all translations will be routed to GPU instead of CPU.  If GPU is not detected, all translations will be sent to CPU.
+#### <u>[Current] Configuration</u>: CPU or GPU</i>
+Using CTranslate2's device argument of ```auto```, the API will default to GPU if present and use CPU if GPU isn't detected.  To manually override the ```auto``` configuration, set ```lt.device = "cpu"``` or ```lt.device = "cuda"``` in app.py. 
 
-Space and build time can be saved if you intend to use CPU only by commenting out line 24 of the Dockerfile and uncommenting line 22 to remove the installation of CUDA.  
 
 ---
 
@@ -75,9 +74,10 @@ If integrating with CI / CD services, please update associated files below:
 
 #### Current Metrics:
 1. Code Coverage: 93.9%
-2. Code Smells: 8
+2. Code Smells: 7
 3. Vulnerabilities: 0
 
+---
 # Deploying
 There are two options for deployment, via Docker or locally in terminal.  Instructions for both are below:
 ## Clone Repository
