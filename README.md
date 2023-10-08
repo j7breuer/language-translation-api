@@ -151,7 +151,7 @@ Expect response to follow this format:
 
 ### GET API Help
 
-'GET /help'
+```GET /help```
 
 **Response**
 
@@ -165,7 +165,7 @@ Expect response to follow this format:
 
 ### GET API Help Single
 
-'GET /help/single'
+```GET /help/single```
 
 **Response**
 
@@ -179,7 +179,7 @@ Expect response to follow this format:
 
 ### GET API Help Batch
 
-'GET /help/batch'
+```GET /help/batch```
 
 **Response**
 
@@ -193,7 +193,7 @@ Expect response to follow this format:
 
 ### POST Translation Single
 
-'POST /translation/single'
+```/translation/single```
 
 **Request**
 ```json
@@ -212,11 +212,55 @@ Expect response to follow this format:
   "data": {
     "request": {
       "from_lang": "es",
-      "model_name": "Helsinki-NLP/opus-mt-es-en",
       "to_lang": "en"
     },
-    "response": "Hello how are you?"
+    "response": {
+      "text": "Hello how are you?",
+      "model": "Helsinki-NLP/opus-mt-es-en",
+      "tokenizer": "Helsinki-NLP/opus-mt-es-en",
+      "device": "auto"
+    }
   },
-  "message": "Message translated from es to English."
+  "message": "Message translated from Spanish to English."
+}
+```
+
+### POST Translation Batch
+
+```POST /translation/single```
+
+**Request**
+```json
+{
+    "from_lang": "es",
+    "to_lang": "en",
+    "text": [
+      "Hola como estas?",
+      "Bien y tu?"
+    ]
+}
+```
+
+**Response**
+- '200 OK' on success
+
+```json
+{
+  "data": {
+    "request": {
+      "from_lang": "es",
+      "to_lang": "en"
+    },
+    "response": {
+      "text": [
+        "Hello how are you?",
+        "Good and you?"
+      ],
+      "model": "Helsinki-NLP/opus-mt-es-en",
+      "tokenizer": "Helsinki-NLP/opus-mt-es-en",
+      "device": "auto"
+    }
+  },
+  "message": "Batch results of 2 messages translated from Spanish to English."
 }
 ```
