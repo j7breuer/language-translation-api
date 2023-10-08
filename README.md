@@ -59,9 +59,8 @@ L27: lt.direction = "unidirectional"
 
 ### <u>CPU or GPU Translations</u> [Optional]
 #### <u>[Current] Configuration</u>: CPU or GPU</i>
-Using Torch, the API will be able to detect the presence of a GPU on the system, if a GPU is available, all translations will be routed to GPU instead of CPU.  If GPU is not detected, all translations will be sent to CPU.
+Using CTranslate2's device argument of ```auto```, the API will default to GPU if present and use CPU if GPU isn't detected.  To manually override the ```auto``` configuration, set ```lt.device = "cpu"``` or ```lt.device = "cuda"``` in app.py. 
 
-The current configuration for model storage on device is ```auto```, with GPU as first priority, if no GPU present then it will default to CPU.  To hardcode CPU, set  ```lt.device = "cpu"```, for GPU set ```lt.device = "cuda"```.
 
 ---
 
@@ -75,9 +74,10 @@ If integrating with CI / CD services, please update associated files below:
 
 #### Current Metrics:
 1. Code Coverage: 93.9%
-2. Code Smells: 8
+2. Code Smells: 7
 3. Vulnerabilities: 0
 
+---
 # Deploying
 There are two options for deployment, via Docker or locally in terminal.  Instructions for both are below:
 ## Clone Repository

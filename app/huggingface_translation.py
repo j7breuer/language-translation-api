@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 class LanguageTranslation:
     def __init__(self):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = "auto" # defaults to gpu if present, cpu if not - other argument options: cuda, cpu
         self.master_lang = "en"
         self.direction = "bidirectional"
         self.model_prefix_name = "Helsinki-NLP/opus-mt-"
@@ -44,7 +44,7 @@ class LanguageTranslation:
         '''
         # Create model string name for download/loading, uses helsinki model name
         model_string_name = f"{self.model_dir}/{from_lang}_{to_lang}"
-        model = ctranslate2.Translator(model_string_name, device = str(self.device))
+        model = ctranslate2.Translator(model_string_name, device = self.device)
         return model
 
     def load_languages(self):
