@@ -23,6 +23,9 @@ lt.languages_supported = abbr_key
 # Set master language, already set as default
 # lt.master_lang = "en"
 
+# Set cpu device
+lt.device = "cpu"
+
 # Set direction of translations (unidirectional vs. bidirectional), already set as default
 # lt.direction = "bidirectional"
 
