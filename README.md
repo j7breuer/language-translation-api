@@ -1,5 +1,5 @@
 
-# Language Translation Microservice [Beta]
+# Language Translation Microservice [Beta] 
 Flask-based API that provides language translation capabilities using the latest <a href="https://marian-nmt.github.io/">MarianNMT</a> models developed by the <a href="https://blogs.helsinki.fi/language-technology/">Language Technology Research Group at the University of Helsinki</a>.  All model inference times are enhanced using <a href="https://github.com/OpenNMT/CTranslate2">CTranslate2</a>, a C++ and Python library built to optimize transformer models.  This API is fully customizable, by default it takes in text from 3 languages currently and can translate bi-directionally with English (to, from).  The API comes with a single and batch endpoint for translations.
 
 The <a href="https://blogs.helsinki.fi/language-technology/">Language Technology Research Group at the University of Helsinki's</a> models built on the <a href="https://marian-nmt.github.io/">MarianNMT</a> framework benefit from:
