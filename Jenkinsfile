@@ -17,7 +17,7 @@ pipeline {
                     echo "\n<--------- Installing PyTorch... --------->"
                     sh 'pip3.9 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu'
                     echo "\n<--------- Installing requirements.txt --------->"
-                    sh 'pip3.9 install -r requirements.txt'
+                    sh "pip3.9 install -r requirements.txt --no-cache-dir --index-url http://\$NEXUS_USERNAME:\$NEXUS_PASSWORD@192.168.50.25:8081/repository/Workstation_PyPi/simple --trusted-host ${env.NEXUS}"
                     sh 'python3.9 -m nltk.downloader punkt'
                     echo "\n<--------- Installing models --------->"
                     sh "chmod +x ./ct2-model-converter.sh"
@@ -63,7 +63,7 @@ pipeline {
                 echo '\n=======================\n[START] Docker Push to Nexus...\n=======================\n'
                 echo 'Tagging docker build...'
                 script {
-                    docker.withRegistry("https://192.168.50.25:5000/analytics/", "nexus-login") {
+                    docker.withRegistry("https://${env.NEXUS}:5000/analytics/", "nexus-login") {
                         buildImage.push("${env.BUILD_NUMBER}")
                         buildImage.push("latest")
                     }
