@@ -71,7 +71,10 @@ pipeline {
                 echo '\n=====================\n[END] Docker Push to Nexus...\n=====================\n'
             }
         }
-        stage('Docker Publish') {
+        stage('Docker Publish to Remote') {
+            when {
+                expression { return env.BRANCH_NAME == 'master' }
+            }
             steps {
                 echo '\n===========================\n[START] Publishing Build...\n===========================\n'
                 echo 'Running docker push...'
@@ -79,8 +82,11 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'nexus-login', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
                         sh """
                             ssh -o StrictHostKeyChecking=no user@${env.DOCKER} "
-                                docker stop ${container_name}
-                                docker rm ${container_name}
+                                if docker ps -a | grep -q ${container_name}; then
+                                    docker stop ${container_name}
+                                    docker rm ${container_name}
+                                fi
+
                                 docker login -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD} ${env.NEXUS}:5000
                                 docker pull ${image_name}
                                 docker run -d --name ${container_name} --restart=unless-stopped -p ${host_port}:${container_port} --privileged ${image_name}
