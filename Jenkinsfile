@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        image_name = "${env.NEXUS}:5000/language-translation-api:latest"
+        container_name = "language-translation-api"
+        host_port = "4567"
+        container_port = "4567"
+    }
+
     stages {
         stage('Environment Setup') {
             steps {
@@ -46,7 +53,7 @@ pipeline {
                 echo '\n=======================\n[START] Docker Build...\n=======================\n'
                 echo 'Running docker build...'
                 script {
-                    buildImage = docker.build("language_translation_api:${env.BUILD_ID}")
+                    buildImage = docker.build("${container_name}:${env.BUILD_ID}")
                 }
                 echo '\n=====================\n[END] Docker Push to Nexus...\n=====================\n'
             }
@@ -68,6 +75,21 @@ pipeline {
             steps {
                 echo '\n===========================\n[START] Publishing Build...\n===========================\n'
                 echo 'Running docker push...'
+                sshagent(credentials: ['docker-login']) {
+                    withCredentials([usernamePassword(credentialsId: 'nexus-login', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no user@${env.DOCKER} "
+                                docker stop ${container_name}
+                                docker rm ${container_name}
+                                docker login -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD} ${env.NEXUS}:5000
+                                docker pull ${image_name}
+                                docker run -d --name ${container_name} --restart=unless-stopped -p ${host_port}:${container_port} --privileged ${image_name}
+                                docker system prune -af
+                                docker logout
+                            "
+                        """
+                    }
+                }
                 echo '\n=========================\n[END] Publishing Build...\n=========================\n'
             }
         }
