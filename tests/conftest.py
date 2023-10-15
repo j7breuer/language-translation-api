@@ -66,7 +66,7 @@ def expected_translation_single():
                 "text": "Hola, ¿cómo estás?",
                 "model": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
                 "tokenizer": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
-                "device": "auto"
+                "device": "cpu"
             }
         }
     }
@@ -102,7 +102,7 @@ def expected_translation_batch():
                 ],
                 "model": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
                 "tokenizer": f"Helsinki-NLP/opus-mt-{from_lang}-{to_lang}",
-                "device": "auto"
+                "device": "cpu"
             }
         }
     }
