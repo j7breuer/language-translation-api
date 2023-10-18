@@ -112,7 +112,7 @@ class translation_batch(Resource):
         if not to_lang in lt.languages_supported.keys():
             abort(400, f"{to_lang} not in languages supported by {lt.model_name}.")
         if not isinstance(text, list):
-            abort(400, f"Text must be a list of strings."
+            abort(400, f"Text must be a list of strings.")
         # Translate in batch
         oupt = lt.translate_batch(from_lang, to_lang, text)
 
