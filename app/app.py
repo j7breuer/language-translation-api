@@ -75,9 +75,9 @@ class translation_single(Resource):
         to_lang = data["to_lang"]
         text = data["text"]
         if not from_lang in lt.languages_supported.keys():
-            abort(400, f"{from_lang} not in languages supported by {lt.model_name}.")
+            abort(400, f"{from_lang} not in languages supported by API: {', '.join(lt.languages_supported.keys())}.")
         if not to_lang in lt.languages_supported.keys():
-            abort(400, f"{to_lang} not in languages supported by {lt.model_name}.")
+            abort(400, f"{to_lang} not in languages supported by API: {', '.join(lt.languages_supported.keys())}.")
         if not isinstance(text, str):
             abort(400, f"Text must be a string.")
         # Translate single
@@ -111,9 +111,9 @@ class translation_batch(Resource):
         to_lang = data["to_lang"]
         text = data['text']
         if not from_lang in lt.languages_supported.keys():
-            abort(400, f"{from_lang} not in languages supported by {lt.model_name}.")
+            abort(400, f"{from_lang} not in languages supported by API: {', '.join(lt.languages_supported.keys())}.")
         if not to_lang in lt.languages_supported.keys():
-            abort(400, f"{to_lang} not in languages supported by {lt.model_name}.")
+            abort(400, f"{to_lang} not in languages supported by API: {', '.join(lt.languages_supported.keys())}.")
         if not isinstance(text, list):
             abort(400, f"Text must be a list of strings.")
         # Translate in batch
