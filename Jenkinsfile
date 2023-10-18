@@ -59,6 +59,9 @@ pipeline {
             }
         }
         stage('Docker Tag and Push to Nexus') {
+            when {
+                expression { return env.BRANCH_NAME == 'master' }
+            }
             steps {
                 echo '\n=======================\n[START] Docker Push to Nexus...\n=======================\n'
                 echo 'Tagging docker build...'
