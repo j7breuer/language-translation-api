@@ -71,6 +71,12 @@ class translation_single(Resource):
         from_lang = data["from_lang"]
         to_lang = data["to_lang"]
         text = data["text"]
+        if not from_lang in lt.languages_supported.keys():
+            abort(400, f"{from_lang} not in languages supported by {lt.model_name}.")
+        if not to_lang in lt.languages_supported.keys():
+            abort(400, f"{to_lang} not in languages supported by {lt.model_name}.")
+        if not isinstance(text, str):
+            abort(400, f"Text must be a string.")
         # Translate single
         oupt = lt.translate_single(from_lang, to_lang, text)
 
@@ -101,6 +107,12 @@ class translation_batch(Resource):
         from_lang = data["from_lang"]
         to_lang = data["to_lang"]
         text = data['text']
+        if not from_lang in lt.languages_supported.keys():
+            abort(400, f"{from_lang} not in languages supported by {lt.model_name}.")
+        if not to_lang in lt.languages_supported.keys():
+            abort(400, f"{to_lang} not in languages supported by {lt.model_name}.")
+        if not isinstance(text, list):
+            abort(400, f"Text must be a list of strings."
         # Translate in batch
         oupt = lt.translate_batch(from_lang, to_lang, text)
 
@@ -121,6 +133,17 @@ class translation_batch(Resource):
                 }
             }
         )
+
+@api.errorhandler(400)
+def bad_request(error_string):
+    return jsonify(
+        {
+            "message": "Bad request.",
+            "data": {
+                "error": str(error_string)
+            }
+        }
+    ), 400
 
 # Run app, bind to local ip and port 4567
 if __name__ == "__main__":
