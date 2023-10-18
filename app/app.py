@@ -137,7 +137,7 @@ class translation_batch(Resource):
             }
         )
 
-@api.errorhandler(400)
+@app.errorhandler(400)
 def bad_request(error_string):
     return jsonify(
         {
