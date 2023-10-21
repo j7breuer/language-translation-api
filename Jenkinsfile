@@ -55,7 +55,7 @@ pipeline {
                 script {
                     buildImage = docker.build("${container_name}:${env.BUILD_ID}")
                 }
-                echo '\n=====================\n[END] Docker Push to Nexus...\n=====================\n'
+                echo '\n=====================\n[END] Docker Build...\n=====================\n'
             }
         }
         stage('Docker Tag and Push to Nexus') {
