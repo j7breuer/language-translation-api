@@ -53,7 +53,9 @@ pipeline {
                 echo '\n=======================\n[START] Docker Build...\n=======================\n'
                 echo 'Running docker build...'
                 script {
-                    buildImage = docker.build("${container_name}:${env.BUILD_ID}")
+                    docker.withRegistry("https://${env.NEXUS}:5000", "nexus-login") {
+                        buildImage = docker.build("${container_name}:${env.BUILD_ID}")
+                    }
                 }
                 echo '\n=====================\n[END] Docker Build...\n=====================\n'
             }
